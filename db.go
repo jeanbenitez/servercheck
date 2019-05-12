@@ -21,18 +21,19 @@ type ServerItem struct {
 	Owner    string `json:"owner"`
 }
 
-// Server data model
-type Server struct {
+// ServerResponse data model
+type ServerResponse struct {
 	Domain           string `json:"domain"`
 	ServersChanged   string `json:"servers_changed"`
 	SslGrade         string `json:"ssl_grade"`
 	PreviousSslGrade string `json:"previous_ssl_grade"`
 	Logo             string `json:"logo"`
 	IsDown           string `json:"is_down"`
+	Servers          []ServerItem
 }
 
 // Render for Server struct
-func (rd *Server) Render(w http.ResponseWriter, r *http.Request) error {
+func (rd *ServerResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	// Pre-processing before a response is marshalled and sent across the wire
 	// rd.Elapsed = 10
 	return nil
@@ -40,14 +41,14 @@ func (rd *Server) Render(w http.ResponseWriter, r *http.Request) error {
 
 // Business logic
 
-var servers []*Server
+var servers []*ServerResponse
 
-func dbNewServer(server *Server) (string, error) {
+func dbNewServer(server *ServerResponse) (string, error) {
 	servers = append(servers, server)
 	return server.Domain, nil
 }
 
-func dbGetServer(domain string) *Server {
+func dbGetServer(domain string) *ServerResponse {
 	db := connect()
 	rows, err := db.Query("SELECT domain, servers_changed, ssl_grade, previous_ssl_grade, logo, is_down FROM servers WHERE domain = $1", domain)
 	if err != nil {
@@ -55,7 +56,7 @@ func dbGetServer(domain string) *Server {
 	}
 	defer rows.Close()
 
-	server := Server{}
+	server := ServerResponse{}
 	for rows.Next() {
 		err = rows.Scan(
 			&server.Domain,
@@ -72,7 +73,7 @@ func dbGetServer(domain string) *Server {
 	return &server
 }
 
-func dbUpdateServer(domain string, server *Server) (*Server, error) {
+func dbUpdateServer(domain string, server *ServerResponse) (*ServerResponse, error) {
 	for i, s := range servers {
 		if s.Domain == domain {
 			servers[i] = server

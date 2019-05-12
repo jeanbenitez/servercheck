@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"regexp"
 
@@ -9,9 +10,35 @@ import (
 	"github.com/go-chi/render"
 )
 
+func indexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
+}
+
 // RenderDomainInfo return json output
 func RenderDomainInfo(domain string) render.Renderer {
-	return dbGetServer(domain)
+	domainData := getDomainDataInSllLabs(domain)
+	whoisData := getWhoisDomain(domain)
+	server := dbGetServer(domain)
+
+	// SSL Grades
+	grades := []string{"A", "A+", "B", "B+", "C", "C+", "D", "D+", "E", "E+", "F", "F+"}
+
+	savedGrade := indexOf(server.SslGrade, grades)
+	newBestGrade := 0
+	for _, v := range domainData.Endpoints {
+		if indexOf(v.Grade, grades) > savedGrade {
+			savedGrade = indexOf(v.Grade, grades)
+		}
+	}
+
+	log.Output(1, whoisData.Changed+string(newBestGrade))
+
+	return server
 }
 
 func start(w http.ResponseWriter, r *http.Request) {
@@ -21,10 +48,7 @@ func start(w http.ResponseWriter, r *http.Request) {
 		var isValidDomain bool
 		isValidDomain, _ = regexp.MatchString("^([a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}$", domain)
 		if isValidDomain {
-			if err := render.Render(w, r, RenderDomainInfo(domain)); err != nil {
-				render.Render(w, r, ErrRender(err))
-				return
-			}
+			render.Render(w, r, RenderDomainInfo(domain))
 		} else {
 			message = "Invalid domain \"" + domain + "\""
 		}

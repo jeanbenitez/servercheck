@@ -17,10 +17,15 @@ services:
     image: cockroachdb/cockroach
     command: start --insecure
     expose:
-    - "8080"
-    - "26257"
+      - "8080"
+      - "26257"
     ports:
-    - "26257:26257"
-    - "8080:8080"
+      - "26257:26257"
+      - "8080:8080"
     networks:
-    - roachnet
+      - roachnet
+
+
+networks:
+  roachnet:
+    driver: bridge

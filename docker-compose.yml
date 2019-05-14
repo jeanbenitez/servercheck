@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  web:
+    restart: always
+    image: servercheck
+    ports:
+      - 8005:8005
+    links:
+      - cockroachdb
+    environment:
+      - "DB_PORT=8080"
+      - "DB_NAME=servercheck"
+      - "DB_PASS=12345"
+  
+  cockroachdb:
+    image: cockroachdb/cockroach
+    command: start --insecure
+    expose:
+    - "8080"
+    - "26257"
+    ports:
+    - "26257:26257"
+    - "8080:8080"
+    networks:
+    - roachnet

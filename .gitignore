@@ -1,2 +1,4 @@
 cockroach-data/*
 .vscode
+vendor
+.DS_Store

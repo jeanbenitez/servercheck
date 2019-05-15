@@ -3,11 +3,9 @@ package controllers
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/jeanbenitez/servercheck/interfaces"
 	"github.com/jeanbenitez/servercheck/models"
-	"github.com/jeanbenitez/servercheck/services"
 )
 
 // NewSQLDomain returns domain interface implementation
@@ -62,18 +60,10 @@ func (m *mysqlDomain) GetByDomain(ctx context.Context, domain string) (*models.D
 		return nil, err
 	}
 
-	// Testing SSL Labs and Whois services
-	domainData := services.GetSslLabsDomainData(domain)
-	whois := services.GetWhois(domain)
-	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
-	fmt.Println("Whois domain name: " + whois.String())
-
 	payload := &models.Domain{}
 	if len(rows) > 0 {
-		// domain previously queried
 		payload = rows[0]
 	} else {
-		// new domain query
 		return nil, models.ErrNotFound
 	}
 

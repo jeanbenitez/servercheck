@@ -11,6 +11,7 @@ import (
 	"github.com/jeanbenitez/servercheck/controllers"
 	"github.com/jeanbenitez/servercheck/interfaces"
 	"github.com/jeanbenitez/servercheck/models"
+	"github.com/jeanbenitez/servercheck/services"
 	"github.com/jeanbenitez/servercheck/utils"
 )
 
@@ -65,6 +66,16 @@ func (d *Domain) Update(w http.ResponseWriter, r *http.Request) {
 func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 	domain := chi.URLParam(r, "domain")
 	payload, err := d.controller.GetByDomain(r.Context(), domain)
+
+	// Testing SSL Labs and Whois services
+	domainData := services.GetSslLabsDomainData(domain)
+	whois := services.GetWhois(domain)
+	title, logo := services.ExtractWebData(domain)
+
+	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
+	fmt.Println("Whois: " + whois.String())
+	fmt.Println("Site title: " + title)
+	fmt.Println("Site logo: " + logo)
 
 	if err != nil {
 		utils.RespondWithError(w, http.StatusNoContent, "Content not found")

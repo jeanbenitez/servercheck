@@ -3,3 +3,4 @@ cockroach-data
 vendor
 .DS_Store
 .dist
+debug

@@ -32,6 +32,17 @@
   pruneopts = "UT"
   revision = "bac499d94236d97610e3d93924f3e4c69c56cf8c"
 
+[[projects]]
+  branch = "master"
+  digest = "1:d7b978a787736537d0ad2f84c0e8b75b05c2febef0537198e28edf1cf2768afd"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom",
+  ]
+  pruneopts = "UT"
+  revision = "3ec19112720433827bbce8be9342797f5a6aaaf9"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -40,6 +51,7 @@
     "github.com/go-chi/chi/middleware",
     "github.com/lib/pq",
     "github.com/xellio/whois",
+    "golang.org/x/net/html",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

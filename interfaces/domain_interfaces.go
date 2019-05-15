@@ -14,3 +14,10 @@ type IDomainController interface {
 	Update(ctx context.Context, d *models.Domain) (*models.Domain, error)
 	Delete(ctx context.Context, domain string) (bool, error)
 }
+
+// IServerController interface...
+type IServerController interface {
+	FetchByDomain(ctx context.Context, domain string) ([]*models.Server, error)
+	Create(ctx context.Context, d *models.Server) (bool, error)
+	Delete(ctx context.Context, domain string) (bool, error)
+}

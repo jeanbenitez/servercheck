@@ -8,18 +8,18 @@ import (
 	"github.com/jeanbenitez/servercheck/models"
 )
 
-// NewSQLDomain returns domain interface implementation
-func NewSQLDomain(Conn *sql.DB) interfaces.IDomainController {
-	return &mysqlDomain{
+// NewControllerDomain returns domain interface implementation
+func NewControllerDomain(Conn *sql.DB) interfaces.IDomainController {
+	return &controllerDomain{
 		Conn: Conn,
 	}
 }
 
-type mysqlDomain struct {
+type controllerDomain struct {
 	Conn *sql.DB
 }
 
-func (m *mysqlDomain) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.Domain, error) {
+func (m *controllerDomain) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.Domain, error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -46,13 +46,13 @@ func (m *mysqlDomain) fetch(ctx context.Context, query string, args ...interface
 	return payload, nil
 }
 
-func (m *mysqlDomain) Fetch(ctx context.Context, num int64) ([]*models.Domain, error) {
-	query := "select id, title, content From domains limit ?"
+func (m *controllerDomain) Fetch(ctx context.Context, num int64) ([]*models.Domain, error) {
+	query := "select id, title, content from domains limit ?"
 
 	return m.fetch(ctx, query, num)
 }
 
-func (m *mysqlDomain) GetByDomain(ctx context.Context, domain string) (*models.Domain, error) {
+func (m *controllerDomain) GetByDomain(ctx context.Context, domain string) (*models.Domain, error) {
 	query := "select * from domains where domain = $1"
 
 	rows, err := m.fetch(ctx, query, domain)
@@ -70,7 +70,7 @@ func (m *mysqlDomain) GetByDomain(ctx context.Context, domain string) (*models.D
 	return payload, nil
 }
 
-func (m *mysqlDomain) Create(ctx context.Context, d *models.Domain) (bool, error) {
+func (m *controllerDomain) Create(ctx context.Context, d *models.Domain) (bool, error) {
 	query := "insert domains SET domain=?, servers_changed=?, ssl_grade=?, 	previous_ssl_grade=?, logo=?, is_down=?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
@@ -96,8 +96,8 @@ func (m *mysqlDomain) Create(ctx context.Context, d *models.Domain) (bool, error
 	return true, nil
 }
 
-func (m *mysqlDomain) Update(ctx context.Context, d *models.Domain) (*models.Domain, error) {
-	query := "Update domains set servers_changed=?, ssl_grade=?, 	previous_ssl_grade=?, logo=?, is_down=? where domain=?"
+func (m *controllerDomain) Update(ctx context.Context, d *models.Domain) (*models.Domain, error) {
+	query := "update domains set servers_changed=?, ssl_grade=?, previous_ssl_grade=?, logo=?, is_down=? where domain=?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
@@ -120,8 +120,8 @@ func (m *mysqlDomain) Update(ctx context.Context, d *models.Domain) (*models.Dom
 	return d, nil
 }
 
-func (m *mysqlDomain) Delete(ctx context.Context, domain string) (bool, error) {
-	query := "delete From domains Where domain=?"
+func (m *controllerDomain) Delete(ctx context.Context, domain string) (bool, error) {
+	query := "delete from domains where domain=?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {

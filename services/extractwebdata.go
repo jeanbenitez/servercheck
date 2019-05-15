@@ -82,17 +82,3 @@ func pageLogo(n *html.Node) string {
 	}
 	return logo
 }
-
-func extractMetaProperty(t html.Token, prop string) (content string, ok bool) {
-	for _, attr := range t.Attr {
-		if attr.Key == "property" && attr.Val == prop {
-			ok = true
-		}
-
-		if attr.Key == "content" {
-			content = attr.Val
-		}
-	}
-
-	return
-}

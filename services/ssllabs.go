@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -18,8 +19,12 @@ func GetSslLabsDomainData(domain string) (domainData models.SslLabsDomainDataRes
 		os.Exit(1)
 	}
 
-	decoder := json.NewDecoder(response.Body)
-	err2 := decoder.Decode(&domainData)
+	// for test purpose
+	body, err := ioutil.ReadAll(response.Body)
+	bodyString := string(body)
+	fmt.Println(bodyString)
+
+	err2 := json.Unmarshal(body, &domainData)
 	if err2 != nil {
 		panic(err)
 	}

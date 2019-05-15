@@ -11,7 +11,14 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}",
-      "env": {},
+      "env": {
+        "DB_HOST": "localhost",
+        "DB_PORT": 26257,
+        "DB_NAME": "servercheck",
+        "DB_USER": "root",
+        "DB_PASS": "",
+        "GOPORT": 8005
+      },
       "args": []
     }
   ]

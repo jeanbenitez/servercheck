@@ -66,12 +66,12 @@ func (m *mysqlDomain) GetByDomain(ctx context.Context, domain string) (*models.D
 	domainData := services.GetSslLabsDomainData(domain)
 	whois := services.GetWhois(domain)
 	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
-	fmt.Println("Whois domain name: " + whois.Name)
+	fmt.Println("Whois domain name: " + whois.String())
 
 	payload := &models.Domain{}
 	if len(rows) > 0 {
-		payload = rows[0]
 		// domain previously queried
+		payload = rows[0]
 	} else {
 		// new domain query
 		return nil, models.ErrNotFound

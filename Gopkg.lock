@@ -24,6 +24,14 @@
   revision = "bc6a3c0594130b1e34005880bc600b6d3f49fa7f"
   version = "v1.1.1"
 
+[[projects]]
+  branch = "master"
+  digest = "1:23a9979c5e3095080edbb8ecf042296b7ec183de05e9eb17af6631a5d5b2abc2"
+  name = "github.com/xellio/whois"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bac499d94236d97610e3d93924f3e4c69c56cf8c"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -31,6 +39,7 @@
     "github.com/go-chi/chi",
     "github.com/go-chi/chi/middleware",
     "github.com/lib/pq",
+    "github.com/xellio/whois",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

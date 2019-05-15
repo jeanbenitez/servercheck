@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/jeanbenitez/servercheck/handlers"
+	"github.com/jeanbenitez/servercheck/utils"
 )
 
 // RenderDomainInfo return json output
@@ -52,12 +52,13 @@ import (
 // }
 
 func main() {
-	dbName := os.Getenv("DB_NAME")
-	dbPass := os.Getenv("DB_PASS")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	goPort := os.Getenv("GOPORT")
+	dbName := utils.GetEnv("DB_NAME", "servercheck")
+	dbHost := utils.GetEnv("DB_HOST", "localhost")
+	dbPort := utils.GetEnv("DB_PORT", "26257")
+	dbUser := utils.GetEnv("DB_USER", "root")
+	dbPass := utils.GetEnv("DB_PASS", "")
+
+	goPort := utils.GetEnv("GOPORT", "8005")
 
 	// DB Connection
 	dataSource := "postgresql://" + dbUser + ":" + dbPass + "@" + dbHost + ":" + dbPort + "/" + dbName + "?sslmode=disable"

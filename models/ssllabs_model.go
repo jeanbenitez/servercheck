@@ -1,7 +1,7 @@
 package models
 
-// SslLabs model
-type SslLabs struct {
+// SslLabsDomainDataResponse model
+type SslLabsDomainDataResponse struct {
 	Host      string `json:"host"`
 	Status    string `json:"status"`
 	Endpoints []struct {

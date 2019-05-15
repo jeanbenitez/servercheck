@@ -42,9 +42,9 @@ func (d *Domain) Create(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(created)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Server Error")
+	} else {
+		utils.RespondwithJSON(w, http.StatusCreated, map[string]string{"message": "Successfully Created"})
 	}
-
-	utils.RespondwithJSON(w, http.StatusCreated, map[string]string{"message": "Successfully Created"})
 }
 
 // Update a domain by domain
@@ -56,9 +56,9 @@ func (d *Domain) Update(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Server Error")
+	} else {
+		utils.RespondwithJSON(w, http.StatusOK, payload)
 	}
-
-	utils.RespondwithJSON(w, http.StatusOK, payload)
 }
 
 // GetByDomain returns a domain details
@@ -68,9 +68,9 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.RespondWithError(w, http.StatusNoContent, "Content not found")
+	} else {
+		utils.RespondwithJSON(w, http.StatusOK, payload)
 	}
-
-	utils.RespondwithJSON(w, http.StatusOK, payload)
 }
 
 // Delete a domain
@@ -80,7 +80,7 @@ func (d *Domain) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Server Error")
+	} else {
+		utils.RespondwithJSON(w, http.StatusMovedPermanently, map[string]string{"message": "Delete Successfully"})
 	}
-
-	utils.RespondwithJSON(w, http.StatusMovedPermanently, map[string]string{"message": "Delete Successfully"})
 }

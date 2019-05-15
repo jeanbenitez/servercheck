@@ -3,9 +3,11 @@ package controllers
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/jeanbenitez/servercheck/interfaces"
 	"github.com/jeanbenitez/servercheck/models"
+	"github.com/jeanbenitez/servercheck/services"
 )
 
 // NewSQLDomain returns domain interface implementation
@@ -53,17 +55,25 @@ func (m *mysqlDomain) Fetch(ctx context.Context, num int64) ([]*models.Domain, e
 }
 
 func (m *mysqlDomain) GetByDomain(ctx context.Context, domain string) (*models.Domain, error) {
-	query := "select * from domains where domain=?"
+	query := "select * from domains where domain = $1"
 
 	rows, err := m.fetch(ctx, query, domain)
 	if err != nil {
 		return nil, err
 	}
 
+	// Testing SSL Labs and Whois services
+	domainData := services.GetSslLabsDomainData(domain)
+	whois := services.GetWhois(domain)
+	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
+	fmt.Println("Whois domain name: " + whois.Name)
+
 	payload := &models.Domain{}
 	if len(rows) > 0 {
 		payload = rows[0]
+		// domain previously queried
 	} else {
+		// new domain query
 		return nil, models.ErrNotFound
 	}
 

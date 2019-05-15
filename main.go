@@ -10,6 +10,8 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/jeanbenitez/servercheck/handlers"
 	"github.com/jeanbenitez/servercheck/utils"
+
+	_ "github.com/lib/pq"
 )
 
 // RenderDomainInfo return json output

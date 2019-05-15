@@ -1,11 +1,11 @@
-package domain
+package controllers
 
 import (
 	"context"
 	"database/sql"
 
-	interfaces "github.com/jeanbenitez/servercheck/interfaces"
-	models "github.com/jeanbenitez/servercheck/models"
+	"github.com/jeanbenitez/servercheck/interfaces"
+	"github.com/jeanbenitez/servercheck/models"
 )
 
 // NewSQLDomain returns domain interface implementation

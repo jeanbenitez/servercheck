@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"golang.org/x/net/html"
 )
@@ -18,8 +19,14 @@ func ExtractWebData(domain string) (title string, logo string) {
 	}
 	title = pageTitle(page)
 	logo = pageLogo(page)
-	if logo != "" && logo[0] == 47 {
-		logo = url + logo
+	if logo != "" {
+		globalURL, _ := regexp.MatchString("^http", logo)
+		if !globalURL {
+			if logo[0] != 47 {
+				logo = "/" + logo
+			}
+			logo = url + logo
+		}
 	}
 	return
 }
@@ -56,19 +63,25 @@ func pageTitle(n *html.Node) string {
 // pageLogo finds og:image in meta tags
 func pageLogo(n *html.Node) string {
 	var logo string
-	if n.Type == html.ElementNode && n.Data == "meta" {
-		ok := false
+	if n.Type == html.ElementNode && (n.Data == "meta" || n.Data == "link") {
+		key := ""
 		for _, attr := range n.Attr {
-			if (attr.Key == "property" && attr.Val == "og:image") || (attr.Key == "itemprop" && attr.Val == "image") {
-				ok = true
+			if n.Data == "meta" && (attr.Key == "property" && attr.Val == "og:image") || (attr.Key == "itemprop" && attr.Val == "image") {
+				key = "content"
+			} else if n.Data == "link" && attr.Key == "rel" {
+				icon, _ := regexp.MatchString("icon", attr.Val)
+				if icon {
+					key = "href"
+				}
 			}
 
-			if attr.Key == "content" {
+			if key != "" && attr.Key == key {
 				logo = attr.Val
+				break
 			}
 		}
 
-		if ok {
+		if key != "" && logo != "" {
 			return logo
 		}
 

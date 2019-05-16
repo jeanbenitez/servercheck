@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/go-chi/chi"
@@ -72,11 +73,12 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		domainPayload = new(models.Domain)
+		domainPayload.Domain = domain
+
+		title, logo := services.ExtractWebData(domain)
+		domainPayload.Logo = logo
+		domainPayload.Title = title
 	}
-
-	serversPayload, _ := d.serverController.FetchByDomain(r.Context(), domain)
-
-	fmt.Println("Servers: " + string(len(serversPayload)))
 
 	domainData := services.GetSslLabsDomainData(domain)
 
@@ -103,7 +105,12 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 		domainPayload.SslGrade = newGrade
 	}
 
-	servers := make([]*models.Server, 0)
+	serversPayload, err2 := d.serverController.FetchByDomain(r.Context(), domain)
+	d.serverController.Delete(r.Context(), domain)
+
+	domainPayload.ServersChanged = len(domainPayload.Servers) != len(domainData.Endpoints)
+
+	servers := make([]*models.Server, len(domainData.Endpoints))
 	for _, endpoint := range domainData.Endpoints {
 		whois := services.GetWhoisIP(endpoint.IPAddress)
 		server := new(models.Server)
@@ -111,20 +118,41 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 		server.SslGrade = endpoint.Grade
 		server.Country = strings.Join(whois.Output["Country"], ",")
 		server.Owner = strings.Join(whois.Output["Organization"], ",")
-		servers = append(servers, server)
-	}
 
-	title, logo := services.ExtractWebData(domain)
+		if !domainPayload.ServersChanged {
+			var savedServer *models.Server
+			if err2 == nil {
+				for i, s := range serversPayload {
+					if strings.Compare(s.Address, endpoint.IPAddress) == 0 {
+						savedServer = serversPayload[i]
+						break
+					}
+				}
+			}
+
+			if savedServer != nil {
+				domainPayload.ServersChanged = reflect.DeepEqual(server, savedServer)
+			}
+		}
+
+		servers = append(servers, server)
+		d.serverController.Create(r.Context(), server)
+	}
 
 	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
-	fmt.Println("Site title: " + title)
-	fmt.Println("Site logo: " + logo)
+
+	domainPayload.IsDown = domainData.Status == "ERROR"
 
 	if err != nil {
-		utils.RespondWithError(w, http.StatusNoContent, "Content not found")
+		d.domainController.Create(r.Context(), domainPayload)
 	} else {
-		utils.RespondwithJSON(w, http.StatusOK, domainPayload)
+		domainPayload, _ = d.domainController.Update(r.Context(), domainPayload)
 	}
+	for _, s := range servers {
+		domainPayload.Servers = append(domainPayload.Servers, *s)
+	}
+
+	utils.RespondwithJSON(w, http.StatusOK, domainPayload)
 }
 
 // Delete a domain

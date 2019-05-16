@@ -18,6 +18,6 @@ type IDomainController interface {
 // IServerController interface...
 type IServerController interface {
 	FetchByDomain(ctx context.Context, domain string) ([]*models.Server, error)
-	Create(ctx context.Context, d *models.Server) (bool, error)
+	Create(ctx context.Context, domain string, d *models.Server) (bool, error)
 	Delete(ctx context.Context, domain string) (bool, error)
 }

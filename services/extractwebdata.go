@@ -64,24 +64,27 @@ func pageTitle(n *html.Node) string {
 func pageLogo(n *html.Node) string {
 	var logo string
 	if n.Type == html.ElementNode && (n.Data == "meta" || n.Data == "link") {
-		key := ""
+		key := "content"
+		if n.Data == "link" {
+			key = "href"
+		}
+		ok := false
 		for _, attr := range n.Attr {
 			if n.Data == "meta" && (attr.Key == "property" && attr.Val == "og:image") || (attr.Key == "itemprop" && attr.Val == "image") {
-				key = "content"
+				ok = true
 			} else if n.Data == "link" && attr.Key == "rel" {
 				icon, _ := regexp.MatchString("icon", attr.Val)
 				if icon {
-					key = "href"
+					ok = true
 				}
 			}
 
-			if key != "" && attr.Key == key {
+			if attr.Key == key {
 				logo = attr.Val
-				break
 			}
 		}
 
-		if key != "" && logo != "" {
+		if ok && logo != "" {
 			return logo
 		}
 

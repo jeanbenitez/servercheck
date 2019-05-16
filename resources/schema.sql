@@ -18,7 +18,7 @@ CREATE TABLE "servers" (
   "ssl_grade" VARCHAR(2) NOT NULL,
   "country" VARCHAR(3) NULL DEFAULT NULL,
   "owner" VARCHAR(100) NULL DEFAULT NULL,
-  PRIMARY KEY ("domain")
+  INDEX KEY ("domain")
 );
 
 -- ---
@@ -34,8 +34,8 @@ CREATE TABLE "domains" (
   "ssl_grade" VARCHAR(2) NOT NULL,
   "previous_ssl_grade" VARCHAR(2) NOT NULL,
   "logo" VARCHAR NULL DEFAULT NULL,
-  "is_down" BOOL NOT NULL DEFAULT false,
-  PRIMARY KEY ("domain")
+  "title" VARCHAR NULL DEFAULT NULL,
+  "is_down" BOOL NOT NULL DEFAULT false
 );
 
 -- ---

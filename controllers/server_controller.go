@@ -49,8 +49,8 @@ func (m *controllerServer) FetchByDomain(ctx context.Context, domain string) ([]
 	return m.fetch(ctx, query, domain)
 }
 
-func (m *controllerServer) Create(ctx context.Context, d *models.Server) (bool, error) {
-	query := "insert servers SET address=?, ssl_grade=?, country=?, owner=?"
+func (m *controllerServer) Create(ctx context.Context, domain string, d *models.Server) (bool, error) {
+	query := "insert into servers (domain, address, ssl_grade, country, owner) VALUES ($1, $2, $3, $4, $5)"
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return false, err
@@ -58,6 +58,7 @@ func (m *controllerServer) Create(ctx context.Context, d *models.Server) (bool, 
 
 	_, err2 := stmt.ExecContext(
 		ctx,
+		domain,
 		d.Address,
 		d.SslGrade,
 		d.Country,
@@ -73,7 +74,7 @@ func (m *controllerServer) Create(ctx context.Context, d *models.Server) (bool, 
 }
 
 func (m *controllerServer) Delete(ctx context.Context, domain string) (bool, error) {
-	query := "delete from servers where domain=?"
+	query := "delete from servers where domain=$1"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {

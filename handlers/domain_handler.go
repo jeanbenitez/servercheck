@@ -31,11 +31,31 @@ type Domain struct {
 	serverController interfaces.IServerController
 }
 
+// FetchDomains ...
+type FetchDomains struct {
+	Items []*models.Domain `json:"items"`
+}
+
 // Fetch all domain data
 func (d *Domain) Fetch(w http.ResponseWriter, r *http.Request) {
-	payload, _ := d.domainController.Fetch(r.Context(), 5)
+	domainsPayload, err := d.domainController.Fetch(r.Context(), 5)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
 
-	utils.RespondwithJSON(w, http.StatusOK, payload)
+	for _, domain := range domainsPayload {
+		if domain != nil {
+			serversPayload, err2 := d.serverController.FetchByDomain(r.Context(), domain.Domain)
+			if err2 == nil {
+				for _, server := range serversPayload {
+					if server != nil {
+						domain.Servers = append(domain.Servers, *server)
+					}
+				}
+			}
+		}
+	}
+	utils.RespondwithJSON(w, http.StatusOK, FetchDomains{Items: domainsPayload})
 }
 
 // Create a new domain
@@ -74,12 +94,11 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		domainPayload = new(models.Domain)
 		domainPayload.Domain = domain
-
-		title, logo := services.ExtractWebData(domain)
-		domainPayload.Logo = logo
-		domainPayload.Title = title
 	}
 
+	title, logo := services.ExtractWebData(domain)
+	domainPayload.Logo = logo
+	domainPayload.Title = title
 	domainData := services.GetSslLabsDomainData(domain)
 
 	// SSL Grades
@@ -136,7 +155,7 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 		}
 
 		servers = append(servers, server)
-		d.serverController.Create(r.Context(), server)
+		d.serverController.Create(r.Context(), domain, server)
 	}
 
 	fmt.Println("SSL Labbs Query Status: " + domainData.Status)
@@ -149,7 +168,9 @@ func (d *Domain) GetByDomain(w http.ResponseWriter, r *http.Request) {
 		domainPayload, _ = d.domainController.Update(r.Context(), domainPayload)
 	}
 	for _, s := range servers {
-		domainPayload.Servers = append(domainPayload.Servers, *s)
+		if s != nil {
+			domainPayload.Servers = append(domainPayload.Servers, *s)
+		}
 	}
 
 	utils.RespondwithJSON(w, http.StatusOK, domainPayload)

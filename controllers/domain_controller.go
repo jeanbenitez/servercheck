@@ -36,6 +36,7 @@ func (m *controllerDomain) fetch(ctx context.Context, query string, args ...inte
 			&data.SslGrade,
 			&data.PreviousSslGrade,
 			&data.Logo,
+			&data.Title,
 			&data.IsDown,
 		)
 		if err != nil {
@@ -47,13 +48,13 @@ func (m *controllerDomain) fetch(ctx context.Context, query string, args ...inte
 }
 
 func (m *controllerDomain) Fetch(ctx context.Context, num int64) ([]*models.Domain, error) {
-	query := "select domain, servers_changed, ssl_grade, previous_ssl_grade, logo, title, is_down, from domains limit ?"
+	query := "select domain, servers_changed, ssl_grade, previous_ssl_grade, logo, title, is_down from domains limit $1"
 
 	return m.fetch(ctx, query, num)
 }
 
 func (m *controllerDomain) GetByDomain(ctx context.Context, domain string) (*models.Domain, error) {
-	query := "select * from domains where domain = $1"
+	query := "select domain, servers_changed, ssl_grade, previous_ssl_grade, logo, title, is_down from domains where domain = $1"
 
 	rows, err := m.fetch(ctx, query, domain)
 	if err != nil {
@@ -71,7 +72,7 @@ func (m *controllerDomain) GetByDomain(ctx context.Context, domain string) (*mod
 }
 
 func (m *controllerDomain) Create(ctx context.Context, d *models.Domain) (bool, error) {
-	query := "insert domains SET domain=?, servers_changed=?, ssl_grade=?, 	previous_ssl_grade=?, logo=?, is_down=?"
+	query := "insert into domains (domain, servers_changed, ssl_grade, previous_ssl_grade, logo, title, is_down) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
@@ -85,6 +86,7 @@ func (m *controllerDomain) Create(ctx context.Context, d *models.Domain) (bool, 
 		d.SslGrade,
 		d.PreviousSslGrade,
 		d.Logo,
+		d.Title,
 		d.IsDown,
 	)
 	defer stmt.Close()
@@ -97,7 +99,7 @@ func (m *controllerDomain) Create(ctx context.Context, d *models.Domain) (bool, 
 }
 
 func (m *controllerDomain) Update(ctx context.Context, d *models.Domain) (*models.Domain, error) {
-	query := "update domains set servers_changed=?, ssl_grade=?, previous_ssl_grade=?, logo=?, is_down=? where domain=?"
+	query := "update domains set servers_changed=$1, ssl_grade=$2, previous_ssl_grade=$3, logo=$4, title=$5, is_down=$6 where domain=$7"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
@@ -109,6 +111,7 @@ func (m *controllerDomain) Update(ctx context.Context, d *models.Domain) (*model
 		d.SslGrade,
 		d.PreviousSslGrade,
 		d.Logo,
+		d.Title,
 		d.IsDown,
 		d.Domain,
 	)
@@ -121,7 +124,7 @@ func (m *controllerDomain) Update(ctx context.Context, d *models.Domain) (*model
 }
 
 func (m *controllerDomain) Delete(ctx context.Context, domain string) (bool, error) {
-	query := "delete from domains where domain=?"
+	query := "delete from domains where domain=$1"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {

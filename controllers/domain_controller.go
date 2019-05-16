@@ -47,7 +47,7 @@ func (m *controllerDomain) fetch(ctx context.Context, query string, args ...inte
 }
 
 func (m *controllerDomain) Fetch(ctx context.Context, num int64) ([]*models.Domain, error) {
-	query := "select id, title, content from domains limit ?"
+	query := "select domain, servers_changed, ssl_grade, previous_ssl_grade, logo, title, is_down, from domains limit ?"
 
 	return m.fetch(ctx, query, num)
 }

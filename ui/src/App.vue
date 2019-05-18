@@ -17,12 +17,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import SearchDomain from './components/SearchDomain.vue';
+import ListSearched from './components/ListSearched.vue';
 
 type IView = 'search' | 'list';
 
 @Component({
   components: {
     SearchDomain,
+    ListSearched,
   },
 })
 export default class App extends Vue {

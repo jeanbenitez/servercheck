@@ -1,4 +1,4 @@
-# ui
+# servercheck/ui
 
 ## Project setup
 ```

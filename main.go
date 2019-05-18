@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jeanbenitez/servercheck/handlers"
 	"github.com/jeanbenitez/servercheck/utils"
 
@@ -76,6 +77,13 @@ func main() {
 	r.Use(middleware.Recoverer)
 	// r.Use(middleware.URLFormat)
 	// r.Use(render.SetContentType(render.ContentTypeJSON))
+
+	// Basic CORS
+	cors := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	})
+	r.Use(cors.Handler)
 
 	dHandler := handlers.NewDomainHandler(conn)
 	r.Route("/", func(rt chi.Router) {

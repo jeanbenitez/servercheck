@@ -12,20 +12,18 @@ import (
 // following all the links and fills the `visited` map
 func ExtractWebData(domain string) (title string, logo string) {
 	url := "http://" + domain
-	page, err := parse(url)
+	r, page, err := parse(url)
 	if err != nil {
 		fmt.Printf("Error getting page %s %s\n", url, err)
 		return
 	}
+	realURL := r.Request.URL.String()
 	title = pageTitle(page)
 	logo = pageLogo(page)
 	if logo != "" {
 		globalURL, _ := regexp.MatchString("^http", logo)
 		if !globalURL {
-			if logo[0] != 47 {
-				logo = "/" + logo
-			}
-			logo = url + logo
+			logo = realURL + logo
 		}
 	}
 	return
@@ -33,16 +31,16 @@ func ExtractWebData(domain string) (title string, logo string) {
 
 // parse given a string pointing to a URL will fetch and parse it
 // returning an html.Node pointer
-func parse(url string) (*html.Node, error) {
+func parse(url string) (*http.Response, *html.Node, error) {
 	r, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot get page")
+		return nil, nil, fmt.Errorf("Cannot get page")
 	}
 	b, err := html.Parse(r.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot parse page")
+		return nil, nil, fmt.Errorf("Cannot parse page")
 	}
-	return b, err
+	return r, b, err
 }
 
 // pageTitle finds the title tag

@@ -13,6 +13,14 @@
   version = "v4.0.2"
 
 [[projects]]
+  branch = "master"
+  digest = "1:376e0141c4929ef4d2a4387bd67e3b1ec6ef8cfc1780a198c08bdef6ac544d54"
+  name = "github.com/go-chi/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "07727c846d14299758e54a275dd8c81353c01960"
+
+[[projects]]
   digest = "1:bdd53b87de8185da386bae179c84d4848854c6870bacacf6a154fe63e2e750f7"
   name = "github.com/lib/pq"
   packages = [
@@ -49,6 +57,7 @@
   input-imports = [
     "github.com/go-chi/chi",
     "github.com/go-chi/chi/middleware",
+    "github.com/go-chi/cors",
     "github.com/lib/pq",
     "github.com/xellio/whois",
     "golang.org/x/net/html",

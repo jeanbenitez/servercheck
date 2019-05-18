@@ -38,7 +38,7 @@ type FetchDomains struct {
 
 // Fetch all domain data
 func (d *Domain) Fetch(w http.ResponseWriter, r *http.Request) {
-	domainsPayload, err := d.domainController.Fetch(r.Context(), 5)
+	domainsPayload, err := d.domainController.Fetch(r.Context(), 100)
 	if err != nil {
 		fmt.Print(err.Error())
 	}
